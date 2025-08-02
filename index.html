@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link id="favicon" rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%23212529' stroke='%23F58220' stroke-width='4'/%3E%3Cpath d='M35 25 H 60 Q 75 40 60 55 L 60 75 H 35 V 25 M 35 45 H 55 Q 65 45 55 50' fill='%23F58220'/%3E%3C/svg%3E" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Robin Agent Manager</title>
+    <link rel="manifest" href="/manifest.json" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap');
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+      
+      body {
+        --font-ui: 'Inter', sans-serif;
+        --font-mono: 'JetBrains Mono', monospace;
+        font-family: 'Kanit', sans-serif;
+      }
+      
+      body[data-theme="matrix"] {
+        --c-primary: #00ff41;
+        --c-background: #050a05;
+        --c-background-light: #0d1a0d;
+        --c-text: #00ff41;
+        --c-text-muted: #00ff41b3;
+        --c-card-bg: rgba(10, 25, 10, 0.65); /* More transparent and green-tinted */
+        --c-border: rgba(0, 255, 65, 0.25);
+        --c-button-bg: var(--c-primary);
+        --c-button-text: var(--c-background);
+        --c-input-bg: rgba(0, 0, 0, 0.4); /* Transparent inputs */
+        --c-success: #22c55e;
+        --c-danger: #ef4444;
+
+        --font-family: 'JetBrains Mono', monospace;
+        --border-radius: 0px;
+        --shadow: 0 0 4px rgba(0, 255, 65, 0.4); /* Define a glow for cards */
+        --shadow-glow: 0 0 5px var(--c-primary), 0 0 10px var(--c-primary);
+      }
+      
+      body[data-theme="cyberpunk"] {
+        --c-primary: #ec4899; /* pink-500 */
+        --c-secondary: #0ea5e9; /* sky-500 */
+        --c-background: #0f172a; /* slate-900 */
+        --c-background-light: #1e293b; /* slate-800 */
+        --c-text: #e2e8f0; /* slate-200 */
+        --c-text-muted: #94a3b8; /* slate-400 */
+        --c-card-bg: rgba(30, 41, 59, 0.5); /* slate-800 with alpha */
+        --c-border: rgba(51, 65, 85, 0.7); /* slate-700 with alpha */
+        --c-button-bg: var(--c-primary);
+        --c-button-text: #ffffff;
+        --c-input-bg: rgba(15, 23, 42, 0.7); /* slate-900 with alpha */
+        --c-success: #4ade80; /* green-400 */
+        --c-danger: #f87171; /* red-400 */
+
+        --font-family: var(--font-ui);
+        --border-radius: 0.5rem;
+        --shadow: none;
+        --shadow-glow: 0 0 8px var(--c-primary);
+      }
+      
+      body[data-theme="robin"] {
+        --c-primary: #3b82f6; /* blue-500 */
+        --c-background: #f3f4f6; /* gray-100 */
+        --c-background-light: #ffffff; /* white */
+        --c-text: #1f2937; /* gray-800 */
+        --c-text-muted: #6b7280; /* gray-500 */
+        --c-card-bg: rgba(255, 255, 255, 0.8);
+        --c-border: #e5e7eb; /* gray-200 */
+        --c-button-bg: var(--c-primary);
+        --c-button-text: #ffffff;
+        --c-input-bg: #ffffff;
+        --c-success: #16a34a; /* green-600 */
+        --c-danger: #dc2626; /* red-600 */
+
+        --font-family: var(--font-ui);
+        --border-radius: 0.5rem;
+        --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.05), 0 1px 2px -1px rgb(0 0 0 / 0.05);
+        --shadow-glow: 0 0 10px rgba(59, 130, 246, 0.4);
+      }
+
+      body[data-theme="friend"] {
+        --c-primary: #6366f1; /* indigo-500 */
+        --c-background: #f9fafb; /* gray-50 */
+        --c-background-light: #ffffff;
+        --c-text: #111827; /* gray-900 */
+        --c-text-muted: #6b7280; /* gray-500 */
+        --c-card-bg: rgba(255, 255, 255, 0.9);
+        --c-border: #d1d5db; /* gray-300 */
+        --c-button-bg: var(--c-primary);
+        --c-button-text: #ffffff;
+        --c-input-bg: #ffffff;
+        --c-success: #16a34a;
+        --c-danger: #be123c;
+
+        --font-family: var(--font-ui);
+        --border-radius: 0.75rem;
+        --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+        --shadow-glow: 0 0 12px rgba(99, 102, 241, 0.3);
+      }
+      
+      body[data-theme="dark"] {
+        --c-primary: #34d399; /* emerald-400 */
+        --c-secondary: #64748b; /* slate-500 for secondary elements */
+        --c-background: #0f172a; /* slate-900 */
+        --c-background-light: #1e293b; /* slate-800 */
+        --c-text: #f8fafc; /* slate-50 */
+        --c-text-muted: #94a3b8; /* slate-400 */
+        --c-card-bg: rgba(30, 41, 59, 0.5); /* slate-800 with alpha */
+        --c-border: #334155; /* slate-700 */
+        --c-button-bg: var(--c-primary);
+        --c-button-text: var(--c-background);
+        --c-input-bg: rgba(15, 23, 42, 0.7); /* slate-900 with alpha */
+        --c-success: #4ade80; /* green-400 */
+        --c-danger: #f87171; /* red-400 */
+
+        --font-family: var(--font-ui);
+        --border-radius: 0.75rem; /* rounded-lg */
+        --shadow: none;
+        --shadow-glow: 0 0 8px var(--c-primary);
+      }
+      
+      body[data-theme="eye-care"] {
+        --c-primary: #818cf8; /* indigo-400 */
+        --c-secondary: #38bdf8; /* light-blue-400 */
+        --c-background: #000000;
+        --c-background-light: #101010;
+        --c-text: #b0b0b0; 
+        --c-text-muted: #737373; /* neutral-500 */
+        --c-card-bg: rgba(16, 16, 16, 0.7);
+        --c-border: #262626; /* neutral-800 */
+        --c-button-bg: var(--c-primary);
+        --c-button-text: #000000;
+        --c-input-bg: #171717; /* neutral-900 */
+        --c-success: #34d399; /* emerald-400 */
+        --c-danger: #fb7185; /* rose-400 */
+
+        --font-family: var(--font-ui);
+        --border-radius: 0.5rem;
+        --shadow: none;
+        --shadow-glow: 0 0 8px var(--c-primary);
+      }
+
+      body[data-theme="people-party"] {
+        --c-primary: #F58220; /* Orange */
+        --c-secondary: #4b5563; /* gray-600 */
+        --c-background: #212529; /* Dark Gray */
+        --c-background-light: #2a2f34; /* Lighter Dark Gray */
+        --c-text: #e5e7eb; /* gray-200 */
+        --c-text-muted: #9ca3af; /* gray-400 */
+        --c-card-bg: rgba(42, 47, 52, 0.7);
+        --c-border: #4b5563; /* gray-600 */
+        --c-button-bg: var(--c-primary);
+        --c-button-text: #ffffff;
+        --c-input-bg: rgba(33, 37, 41, 0.8);
+        --c-success: #22c55e;
+        --c-danger: #ef4444;
+
+        --font-family: var(--font-ui);
+        --border-radius: 0.75rem;
+        --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.2), 0 2px 4px -2px rgb(0 0 0 / 0.2);
+        --shadow-glow: 0 0 12px rgba(245, 130, 32, 0.4);
+      }
+
+      body {
+        font-family: var(--font-family);
+        background-color: var(--c-background);
+        color: var(--c-text);
+        overflow-x: hidden;
+      }
+      
+      #matrix-bg {
+        position: fixed;
+        top: 0; left: 0;
+        z-index: -2;
+        display: none; /* Hidden by default */
+      }
+
+      body[data-theme="matrix"] #matrix-bg {
+        display: block; /* Only show for matrix theme */
+      }
+
+      body::before {
+        content: '';
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        z-index: -1;
+        background: radial-gradient(circle, var(--c-primary) 0%, rgba(0,0,0,0) 40%),
+                    radial-gradient(circle, var(--c-secondary, #3b82f6) 0%, rgba(0,0,0,0) 40%);
+        background-position: 10% 20%, 80% 90%;
+        background-repeat: no-repeat;
+        filter: blur(120px);
+        opacity: 0.15;
+        transition: opacity 0.5s ease-in-out;
+        animation: aurora 20s ease-in-out infinite alternate;
+      }
+      
+      body[data-theme="matrix"]::before {
+        opacity: 0; /* Hide aurora for matrix theme */
+      }
+
+      body[data-theme="matrix"] .shadow-md {
+        box-shadow: var(--shadow);
+      }
+      
+      @keyframes aurora {
+        0% { transform: translate(0, 0) scale(1); }
+        50% { transform: translate(40px, -30px) scale(1.2); }
+        100% { transform: translate(-20px, 50px) scale(0.9); }
+      }
+
+      button, a, div {
+        transition: all 0.2s ease-in-out;
+      }
+      
+      /* Header Glitch Effect */
+      .header-glitch {
+        position: relative;
+        cursor: pointer;
+      }
+      .header-glitch span {
+        display: block;
+        transition: transform 0.2s ease-out;
+      }
+      .header-glitch:hover span {
+        transform: skewX(-5deg) scale(1.05);
+      }
+      .header-glitch::before,
+      .header-glitch::after {
+        content: 'ROBIN';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: var(--c-background);
+        overflow: hidden;
+        opacity: 0;
+        transition: opacity 0.4s ease-out;
+      }
+      .header-glitch:hover::before {
+        opacity: 1;
+        transform: translate(-3px, -3px);
+        clip-path: polygon(0 0, 100% 0, 100% 30%, 0 30%);
+        animation: glitch-anim-1 0.5s infinite alternate-reverse;
+      }
+      .header-glitch:hover::after {
+        opacity: 1;
+        transform: translate(3px, 3px);
+        clip-path: polygon(0 70%, 100% 70%, 100% 100%, 0 100%);
+        animation: glitch-anim-2 0.5s infinite alternate-reverse;
+      }
+      @keyframes glitch-anim-1 {
+        0% { clip-path: polygon(0 50%, 100% 50%, 100% 55%, 0 55%); }
+        100% { clip-path: polygon(0 20%, 100% 20%, 100% 25%, 0 25%); }
+      }
+      @keyframes glitch-anim-2 {
+        0% { clip-path: polygon(0 70%, 100% 70%, 100% 75%, 0 75%); }
+        100% { clip-path: polygon(0 90%, 100% 90%, 100% 95%, 0 95%); }
+      }
+
+
+      @keyframes pulse-glow {
+        0%, 100% {
+          opacity: 1;
+          box-shadow: 0 0 3px var(--c-primary, #fff), 0 0 6px var(--c-primary, #fff);
+        }
+        50% {
+          opacity: 0.8;
+          box-shadow: 0 0 8px var(--c-primary, #fff), 0 0 15px var(--c-primary, #fff);
+        }
+      }
+
+      @keyframes fade-in {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+
+      @keyframes fade-in-up {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      
+      @keyframes blink {
+        50% { opacity: 0; }
+      }
+      
+      .cursor-blink::after {
+        content: '▋';
+        animation: blink 1.2s step-end infinite;
+        color: var(--c-primary);
+        margin-left: 2px;
+      }
+      
+      .modal-backdrop {
+        animation: fade-in 0.2s ease-out forwards;
+      }
+      
+      .modal-panel {
+        animation: fade-in-up 0.3s ease-out forwards;
+      }
+
+      .timeline-item:not(:last-child)::before {
+        content: '';
+        position: absolute;
+        top: 2rem;
+        left: calc(1rem - 1px);
+        bottom: 0;
+        width: 2px;
+        background-color: var(--c-border);
+      }
+
+      .virtual-browser-overlay::after {
+        content: " ";
+        display: block;
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+        z-index: 2;
+        background-size: 100% 2px, 3px 100%;
+        pointer-events: none;
+        animation: flicker 0.15s infinite;
+        opacity: 0.5;
+      }
+
+      @keyframes flicker {
+        0% { opacity: 0.2; }
+        20% { opacity: 0.6; }
+        40% { opacity: 0.3; }
+        60% { opacity: 0.7; }
+        80% { opacity: 0.2; }
+        100% { opacity: 0.6; }
+      }
+
+      .copilot-highlight {
+        outline: 2px solid var(--c-primary);
+        box-shadow: 0 0 15px var(--c-primary), 0 0 25px var(--c-primary) inset;
+        border-radius: 4px;
+        animation: pulse-glow 1.5s infinite;
+        transition: all 0.3s ease-in-out;
+      }
+    </style>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              'primary': 'var(--c-primary)',
+              'secondary': 'var(--c-secondary)',
+              'background': 'var(--c-background)',
+              'background-light': 'var(--c-background-light)',
+              'text': 'var(--c-text)',
+              'text-muted': 'var(--c-text-muted)',
+              'card': 'var(--c-card-bg)',
+              'input': 'var(--c-input-bg)',
+              'border': 'var(--c-border)',
+              'btn-bg': 'var(--c-button-bg)',
+              'btn-text': 'var(--c-button-text)',
+              'success': 'var(--c-success)',
+              'danger': 'var(--c-danger)',
+            },
+            fontFamily: {
+              sans: ['var(--font-ui)', 'sans-serif'],
+              mono: ['var(--font-mono)', 'monospace'],
+            },
+            borderRadius: {
+              'DEFAULT': 'var(--border-radius)',
+              'sm': 'calc(var(--border-radius) * 0.5)',
+              'md': 'var(--border-radius)',
+              'lg': 'var(--border-radius)',
+              'xl': 'calc(var(--border-radius) * 2)',
+              'full': '9999px',
+            },
+            boxShadow: {
+              'DEFAULT': 'var(--shadow)',
+              'md': '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
+              'glow': 'var(--shadow-glow)',
+            },
+            animation: {
+              'pulse-glow': 'pulse-glow 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+              'fade-in-up': 'fade-in-up 0.5s ease-out forwards',
+            },
+          }
+        }
+      }
+    </script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@18.2.0",
+    "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
+    "@google/genai": "https://esm.sh/@google/genai@^0.8.0",
+    "firebase/app": "https://esm.sh/firebase@11.10.0/app",
+    "firebase/firestore": "https://esm.sh/firebase@11.10.0/firestore",
+    "firebase/": "https://esm.sh/firebase@^11.10.0/",
+    "react-dom/": "https://esm.sh/react-dom@^18.2.0/",
+    "react/": "https://esm.sh/react@^18.2.0/",
+    "jspdf": "https://esm.sh/jspdf@2.5.1",
+    "html2canvas": "https://esm.sh/html2canvas@1.4.1",
+    "@firebase/firestore": "https://esm.sh/@firebase/firestore@^4.9.0",
+    "@firebase/app": "https://esm.sh/@firebase/app@^0.14.0"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body class="antialiased">
+    <canvas id="matrix-bg"></canvas>
+    <div id="root"></div>
+    <script type="text/babel" data-presets="react,typescript" data-type="module" src="/index.tsx"></script>
+    <script>
+      // Matrix Rain Effect Script
+      let matrixAnimationId;
+      const setupMatrix = () => {
+        const canvas = document.getElementById('matrix-bg');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const katakana = 'アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズブヅプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポヴッン';
+        const latin = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        const nums = '0123456789';
+        const alphabet = katakana + latin + nums;
+        const fontSize = 16;
+        const columns = canvas.width / fontSize;
+        const rainDrops = [];
+
+        for (let x = 0; x < columns; x++) {
+          rainDrops[x] = 1;
+        }
+
+        const draw = () => {
+          ctx.fillStyle = 'rgba(5, 10, 5, 0.05)';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--c-primary') || '#00ff41';
+          ctx.font = fontSize + 'px monospace';
+
+          for (let i = 0; i < rainDrops.length; i++) {
+            const text = alphabet.charAt(Math.floor(Math.random() * alphabet.length));
+            ctx.fillText(text, i * fontSize, rainDrops[i] * fontSize);
+            if (rainDrops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+              rainDrops[i] = 0;
+            }
+            rainDrops[i]++;
+          }
+        };
+        if (matrixAnimationId) cancelAnimationFrame(matrixAnimationId);
+        const animate = () => {
+          draw();
+          matrixAnimationId = requestAnimationFrame(animate);
+        };
+        animate();
+      };
+      
+      const handleThemeChange = () => {
+        if (document.body.dataset.theme === 'matrix') {
+          setupMatrix();
+        } else {
+          if (matrixAnimationId) {
+            cancelAnimationFrame(matrixAnimationId);
+            matrixAnimationId = null;
+          }
+        }
+      };
+
+      // Initial check
+      handleThemeChange();
+
+      // Observe theme changes
+      const observer = new MutationObserver((mutationsList) => {
+        for (const mutation of mutationsList) {
+          if (mutation.type === 'attributes' && mutation.attributeName === 'data-theme') {
+            handleThemeChange();
+          }
+        }
+      });
+      observer.observe(document.body, { attributes: true });
+
+      window.addEventListener('resize', () => {
+        if (document.body.dataset.theme === 'matrix') {
+          setupMatrix();
+        }
+      });
+    </script>
+  <script type="module" src="/index.tsx"></script>
+</body>
+</html>

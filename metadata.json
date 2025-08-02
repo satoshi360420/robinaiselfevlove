@@ -1,0 +1,8 @@
+{
+  "name": "Project Robin: A Self-Evolving, Multi-Agent Framework",
+  "description": "An advanced, browser-based command layer for architecting a self-evolving, multi-agent operational brain. Robin is designed for complex task automation, guided evolution, and real-world impact.",
+  "requestFramePermissions": [
+    "microphone"
+  ],
+  "prompt": ""
+}
